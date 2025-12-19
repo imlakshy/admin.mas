@@ -97,8 +97,8 @@ export default function Home() {
         {overviewData.map((item, index) => (
           <div key={index} className="card">
             <span className="text-base">{item.title}</span>
-            <span className="text-2xl md:text-3xl lg:text-5xl">{item.value}</span>
-            <span className="text-gray-500 text-sm mt-3">{item.description}</span>
+            <span className="text-5xl">{item.value}</span>
+            <span className="text-gray-500 text-sm mt-3 hidden md:inline">{item.description}</span>
           </div>
         ))}
       </div>
@@ -108,9 +108,9 @@ export default function Home() {
       <div className="flex flex-wrap w-screen px-4 md:px-8">
         {quickActions.map((action, index) => (
           <div key={index} className="quick-action-card" onClick={action.route}>
-            <action.icon size={50} />
+            <action.icon size={20} md:size={50} />
             <span className="text-xl">{action.title}</span>
-            <span className="text-gray-500 text-sm">{action.description}</span>
+            <span className="text-gray-500 text-sm hidden md:inline">{action.description}</span>
           </div>
         ))}
       </div>
