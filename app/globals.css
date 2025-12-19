@@ -27,9 +27,8 @@
   @apply flex flex-1 flex-col m-2 border border-white/10 bg-gradient-to-br from-white/10 to-white/2 p-6 shadow-md rounded-xl max-h-40 min-w-[130px];
   overflow: hidden;
 }
-
 .quick-action-card {
-  @apply flex flex-col items-start gap-3 m-2 bg-linear-to-br from-black to-white/5 border-black border-0 hover:border hover:border-white hover:bg-white/5 hover:scale-105 p-6 shadow-md rounded-xl cursor-pointer transition-transform duration-200 w-[200px];
+  @apply flex flex-col items-start gap-3 m-2 bg-linear-to-br from-black to-white/5  border-black border-0 hover:border hover:border-white hover:bg-white/5 hover:scale-105 p-6 shadow-md rounded-xl cursor-pointer transition-transform duration-200 w-[200px];
 }
 
 /* Title in card: single-line with ellipsis */
@@ -58,7 +57,6 @@
   align-items: center;
   justify-content: center;
 }
-
 .qa-icon svg {
   width: 100%;
   height: 100%;

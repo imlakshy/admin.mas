@@ -96,9 +96,9 @@ export default function Home() {
       <div className="flex flex-wrap w-screen p-4 md:p-8">
         {overviewData.map((item, index) => (
           <div key={index} className="card">
-            <span className="text-base card-title">{item.title}</span>
+            <span className="text-base truncate">{item.title}</span>
             <span className="text-2xl md:text-3xl lg:text-5xl">{item.value}</span>
-            <span className="text-gray-500 text-sm card-desc">{item.description}</span>
+            <span className="text-gray-500 text-sm mt-3 line-clamp-2">{item.description}</span>
           </div>
         ))}
       </div>
@@ -112,7 +112,7 @@ export default function Home() {
               <action.icon />
             </div>
             <span className="text-xl truncate">{action.title}</span>
-            <span className="text-gray-500 text-sm desc-clamp">{action.description}</span>
+            <span className="text-gray-500 text-sm line-clamp-2">{action.description}</span>
           </div>
         ))}
       </div>
