@@ -24,10 +24,44 @@
 }
 
 .card {
-  @apply flex flex-1 flex-col m-2 border border-white/10 bg-gradient-to-br from-white/10 to-white/2 p-6 shadow-md rounded-xl max-h-40 min-w-[130px] overflow-clip;
+  @apply flex flex-1 flex-col m-2 border border-white/10 bg-gradient-to-br from-white/10 to-white/2 p-6 shadow-md rounded-xl max-h-40 min-w-[130px];
+  overflow: hidden;
 }
+
 .quick-action-card {
-  @apply flex flex-1 flex-col m-2 bg-linear-to-br from-black to-white/5  border-black border-0 hover:border hover:border-white hover:bg-white/5 hover:scale-105 p-6 shadow-md rounded-xl cursor-pointer transition-transform duration-200 w-45;
+  @apply flex flex-col items-start gap-3 m-2 bg-linear-to-br from-black to-white/5 border-black border-0 hover:border hover:border-white hover:bg-white/5 hover:scale-105 p-6 shadow-md rounded-xl cursor-pointer transition-transform duration-200 w-[200px];
+}
+
+/* Title in card: single-line with ellipsis */
+.card-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Description: clamp to 2 lines with ellipsis */
+.card-desc,
+.desc-clamp {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: .75rem;
+}
+
+/* Quick action icon container & SVG sizing for consistent icon sizes */
+.qa-icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.qa-icon svg {
+  width: 100%;
+  height: 100%;
 }
 
 
