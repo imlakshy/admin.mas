@@ -108,7 +108,8 @@ export default function Home() {
       <div className="flex flex-wrap w-screen px-4 md:px-8">
         {quickActions.map((action, index) => (
           <div key={index} className="quick-action-card" onClick={action.route}>
-            <action.icon size={20} md:size={50} />
+            <action.icon size={20} className="md:hidden" />
+            <action.icon size={50} className="hidden md:block" />
             <span className="text-xl">{action.title}</span>
             <span className="text-gray-500 text-sm hidden md:inline">{action.description}</span>
           </div>
