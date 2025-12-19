@@ -3,21 +3,33 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --border: #1F2937;
+  --card: #111827;
+  --primaryAccent: #92400E;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #0B0F14;
+    --foreground: #E5E7EB;
+    --border: #1F2937;
+    --card: #111827;
+    --primaryAccent: #92400E;
   }
 }
+
+.card {
+  @apply flex flex-1 flex-col m-2 border border-white/10 bg-gradient-to-br from-white/10 to-white/2 p-6 shadow-md rounded-xl max-h-40 min-w-[130px] overflow-clip;
+}
+.quick-action-card {
+  @apply flex flex-1 flex-col m-2 bg-linear-to-br from-black to-white/5  border-black border-0 hover:border hover:border-white hover:bg-white/5 hover:scale-105 p-6 shadow-md rounded-xl cursor-pointer transition-transform duration-200 w-45;
+}
+
 
 body {
   background: var(--background);
