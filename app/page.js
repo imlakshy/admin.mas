@@ -4,6 +4,7 @@ import TagProductIcon from "@/public/TagProductIcon";
 import AddCircleIcon from "@/public/AddCircleIcon";
 import CubeAnalyticsIcon from "@/public/CubeAnalyticsIcon";
 import { useRouter } from "next/navigation";
+import CountUp from 'react-countup';
 
 export default function Home() {
 
@@ -23,7 +24,8 @@ export default function Home() {
     description: "Total earnings generated in the current month"
   }, {
     title: "Total Revenue",
-    value: "₹231K",
+    value: "231000",
+    prefix: "₹",
     description: "Total earnings generated in the current month"
   }]
 
@@ -97,7 +99,10 @@ export default function Home() {
         {overviewData.map((item, index) => (
           <div key={index} className="card">
             <span className="text-base truncate">{item.title}</span>
-            <span className="text-2xl md:text-3xl lg:text-5xl">{item.value}</span>
+            <span className="text-2xl md:text-3xl lg:text-5xl"><CountUp end={item.value} duration={0.7} prefix={item.prefix || ""} formattingFn={(value) =>
+              value >= 1000 ? `${item.prefix}${Math.floor(value / 1000)}k` : value
+            } />
+            </span>
             <span className="text-gray-500 text-sm mt-3 line-clamp-2">{item.description}</span>
           </div>
         ))}
