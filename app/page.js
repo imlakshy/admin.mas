@@ -107,7 +107,7 @@ export default function Home() {
       <span className="px-6 md:px-10 text-3xl font-semibold">Quick Actions: </span>
       <div className="flex flex-wrap w-screen px-4 md:px-8">
         {quickActions.map((action, index) => (
-          <div key={index} onClick={action.route}>
+          <div key={index} className="quick-action-card" onClick={action.route}>
             <div className="qa-icon">
               <action.icon />
             </div>
