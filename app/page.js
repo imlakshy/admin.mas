@@ -13,11 +13,11 @@ export default function Home() {
   const overviewData = [{
     title: "Fullfilled Product",
     value: "150",
-    description: "Orders successfully completed and delivered this month"
+    description: "Orders successfully delivered this month"
   }, {
     title: "Pending Order",
     value: "13",
-    description: "Orders awaiting processing or shipment this month"
+    description: "Orders awaiting shipment this month"
   }, {
     title: "Total User",
     value: "789",
@@ -42,8 +42,8 @@ export default function Home() {
     route: () => router.push('/products')
 
   }, {
-    title: "Add Category",
-    description: "Create a new product category",
+    title: "Manage Category",
+    description: "Modify existing product category",
     icon: ToggleStorageIcon,
     route: () => router.push('/category')
 
@@ -58,7 +58,7 @@ export default function Home() {
   return (
     <>
       <div className="flex flex-col md:flex-row justify-between mx-10 md:mx-20 lg:mx-30 mt-10 md:mt-32">
-        <div className="greet flex flex-col justify-center">
+        <div className="flex flex-col justify-center">
           <span className="text-2xl md:text-[48px] font-light">Hey 👋</span>
 
           <span className="text-[48px] md:text-[96px] font-extrabold">Lakshya!</span>
@@ -98,7 +98,7 @@ export default function Home() {
       <div className="flex flex-wrap w-screen p-4 md:p-8">
         {overviewData.map((item, index) => (
           <div key={index} className="card">
-            <span className="text-base truncate">{item.title}</span>
+            <span className="text-base line-clamp-1 pb-1 block">{item.title}</span>
             <span className="text-2xl md:text-3xl lg:text-5xl"><CountUp end={item.value} duration={0.7} prefix={item.prefix || ""} formattingFn={(value) =>
               value >= 1000 ? `${item.prefix}${Math.floor(value / 1000)}k` : value
             } />
@@ -116,7 +116,7 @@ export default function Home() {
             <div className="qa-icon">
               <action.icon />
             </div>
-            <span className="text-xl truncate">{action.title}</span>
+            <span className="text-base truncate">{action.title}</span>
             <span className="text-gray-500 text-sm line-clamp-2">{action.description}</span>
           </div>
         ))}

@@ -1,0 +1,155 @@
+import React from 'react'
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+
+const AddCategory = () => {
+  return (<div>
+    <span className="block text-6xl font-bold px-8 pt-16 pb-8">Manage Category</span>
+
+    <div className='flex gap-4 w-screen px-4'>
+      <div className='categoryCard'>
+        <span>Main Category</span>
+
+        <div>
+          <div className="flex w-full max-w-sm items-center gap-2">
+            <Input type="text" placeholder="Eg. Kids" />
+            <Button type="submit" variant="outline">
+              Add
+            </Button>
+          </div>
+        </div>
+
+        <span>Recently Added:</span>
+        <ul className='list-none'>
+          <li>Men's</li>
+          <li>Women's</li>
+          <li>Kid's</li></ul>
+      </div>
+
+      <div className='categoryCard'>
+        <div className='flex gap-2 items-center'>
+          <span>Add Sub-Category for: </span>
+          <Select>
+            <SelectTrigger className="border-0">
+              <SelectValue placeholder="Main Category" />
+            </SelectTrigger>
+            <SelectContent className="bg-[#161616] p-0">
+              <SelectGroup>
+                <SelectLabel className="hover:bg-amber-600">Main Category</SelectLabel>
+                <SelectItem value="apple">Apple</SelectItem>
+                <SelectItem value="banana">Banana</SelectItem>
+                <SelectItem value="blueberry">Blueberry</SelectItem>
+                <SelectItem value="grapes">Grapes</SelectItem>
+                <SelectItem value="pineapple">Pineapple</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div>
+          <div className="flex w-full max-w-sm items-center gap-2">
+            <Input type="text" placeholder="Eg. Jeans" />
+            <Button type="submit" variant="outline">
+              Add
+            </Button>
+          </div>
+        </div>
+
+        <span>Existing Category</span>
+        <ul className='list-none'>
+          <li>Jeans</li>
+          <li>Tee</li>
+          <li>Kid's</li></ul>
+      </div>
+    </div>
+
+    <span className='block text-4xl font-bold p-8 pb-2'>Existing Category: </span>
+
+    <div className='flex flex-wrap gap-2 w-full p-8'>
+
+      <div className='bg-white/2  flex-1 rounded-xl'>
+        <span className='text-3xl font-semibold p-4 block'>Men's</span>
+        <div className='px-8 flex gap-1 flex-col list-none'>
+          
+          <li className="text-2xl">
+            T-Shirts  <br/> <span className="text-base text-gray-500">Top Wear</span>
+          </li>
+
+          <li className="text-2xl  ">
+            Hoodies  <br/> <span className="text-base text-gray-500">Winter Wear</span>
+          </li>
+
+          <li className="text-2xl  ">
+            Shirts  <br/> <span className="text-base text-gray-500">Formal Wear</span>
+          </li>
+
+          <li className="text-2xl  ">
+            Shorts  <br/> <span className="text-base text-gray-500">Casual Wear</span>
+          </li>
+
+          <li className="text-2xl  ">
+            Jackets  <br/> <span className="text-base text-gray-500">Outerwear</span>
+          </li>
+
+          <li className="text-2xl  ">
+            Sneakers  <br/> <span className="text-base text-gray-500">Footwear</span>
+          </li>
+
+          <li className="text-2xl  ">
+            Caps  <br/> <span className="text-base text-gray-500">Accessories</span>
+          </li>
+
+        </div>
+      </div>
+
+      <div className='bg-white/2 rounded-xl flex-1'>
+        <span className='text-3xl font-semibold p-4 block'>Women's</span>
+        <ul className='px-8 flex gap-8 flex-wrap'>
+          
+          <li className="text-2xl">
+            T-Shirts  <br/> <span className="text-base text-gray-500">Top Wear</span>
+          </li>
+
+          <li className="text-2xl  ">
+            Hoodies  <br/> <span className="text-base text-gray-500">Winter Wear</span>
+          </li>
+
+          <li className="text-2xl  ">
+            Shirts  <br/> <span className="text-base text-gray-500">Formal Wear</span>
+          </li>
+
+          <li className="text-2xl  ">
+            Shorts  <br/> <span className="text-base text-gray-500">Casual Wear</span>
+          </li>
+
+          <li className="text-2xl  ">
+            Jackets  <br/> <span className="text-base text-gray-500">Outerwear</span>
+          </li>
+
+          <li className="text-2xl  ">
+            Sneakers  <br/> <span className="text-base text-gray-500">Footwear</span>
+          </li>
+
+          <li className="text-2xl  ">
+            Caps  <br/> <span className="text-base text-gray-500">Accessories</span>
+          </li>
+
+        </ul>
+      </div>
+
+    </div>
+
+
+  </div>)
+}
+
+export default AddCategory
