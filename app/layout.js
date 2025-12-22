@@ -1,5 +1,6 @@
 import { Geist, Jost } from "next/font/google";
 import "./globals.css";
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   variable: "--font-jost-sans",
@@ -20,6 +21,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={jost.className}>
+        <Toaster position="top-right" />
         {children}
       </body>
     </html>

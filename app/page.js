@@ -3,12 +3,18 @@ import ToggleStorageIcon from "@/public/ToggleStorageIcon";
 import TagProductIcon from "@/public/TagProductIcon";
 import AddCircleIcon from "@/public/AddCircleIcon";
 import CubeAnalyticsIcon from "@/public/CubeAnalyticsIcon";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import CountUp from 'react-countup';
 
 export default function Home() {
 
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const overviewData = [{
     title: "Fullfilled Product",
@@ -56,7 +62,8 @@ export default function Home() {
   }]
 
   return (
-    <>
+    <div className={`transition-all duration-1000 ease-out
+    ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
       <div className="flex flex-col md:flex-row justify-between mx-10 md:mx-20 lg:mx-30 mt-10 md:mt-32">
         <div className="flex flex-col justify-center">
           <span className="text-2xl md:text-[48px] font-light">Hey 👋</span>
@@ -121,6 +128,6 @@ export default function Home() {
           </div>
         ))}
       </div>
-    </>
+    </div>
   );
 }

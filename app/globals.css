@@ -52,8 +52,8 @@
   @apply text-[22px]
 }
 
-input, textarea {
-  @apply bg-transparent rounded-md focus:outline-none 
+input, textarea, select {
+  @apply bg-transparent rounded-md outline-none 
 }
 input:not(:placeholder-shown),
 textarea:not(:placeholder-shown) {
