@@ -1,23 +1,23 @@
-import { supabase } from "../lib/supabase";
+import { supabase } from "../../lib/supabase";
 
 const getImgUrl = async (file) => {
-    const fileExt = file.name.split(".").pop();
-    const fileName = `${Date.now()}-${Math.random()}.${fileExt}`;
-    const filePath = `products/${fileName}`;
+  const fileExt = file.name.split(".").pop();
+  const fileName = `${Date.now()}-${Math.random()}.${fileExt}`;
+  const filePath = `products/${fileName}`;
 
-    const { error } = await supabase.storage
-      .from("product-image")
-      .upload(filePath, file);
+  const { error } = await supabase.storage
+    .from("product-image")
+    .upload(filePath, file);
 
-    if (error) {
-      throw error;
-    }
+  if (error) {
+    throw error;
+  }
 
-    const { data } = supabase.storage
-      .from("product-image")
-      .getPublicUrl(filePath);
-      
-    return data.publicUrl;
-  };
+  const { data } = supabase.storage
+    .from("product-image")
+    .getPublicUrl(filePath);
 
-  export { getImgUrl };
+  return data.publicUrl;
+};
+
+export { getImgUrl };
