@@ -1,7 +1,5 @@
 "use client";
 
-export const dynamic = "force-dynamic";
-
 import React from 'react'
 import { ArrowLeft, ArrowRight, Package, Tag, User, GalleryHorizontalEnd } from 'lucide-react'
 import { useState, useEffect } from 'react'
@@ -10,11 +8,93 @@ import { useRouter } from 'next/navigation';
 import { toast } from "sonner";
 import { supabase } from "@/lib/createSupabaseClient";
 import { getImgUrl } from "@/lib/getImgUrl";
+import { useSearchParams } from "next/navigation";
 
 const AddProduct = () => {
 
-  const [mounted, setMounted] = useState(false);
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
+  const searchParams = useSearchParams();
+  const productId = searchParams.get("id");
+
+  useEffect(() => {
+    if (productId) fetchProduct();
+  }, [productId]);
+
+  const fetchProduct = async () => {
+    const { data, error } = await supabase
+      .from("products")
+      .select("*")
+      .eq("id", productId)
+      .single();
+
+    if (!error) {
+      setForm({
+        brand: data.brand,
+        name: data.name,
+        description: data.description,
+        cost: data.cost,
+        price: data.price,
+        stock: data.stock,
+        gender: data.gender,
+        category: data.category,
+        images: data.images || [],
+      });
+    }
+  };
+  const isEdit = Boolean(productId);
+
+  const handleSave = async () => {
+    const payload = {
+      brand: form.brand,
+      name: form.name,
+      description: form.description,
+      cost: form.cost,
+      price: form.price,
+      stock: form.stock,
+      gender: form.gender,
+      category: form.category,
+      images: form.images,
+    };
+
+    const query = supabase.from("products").update(payload).eq("id", productId)
+
+    toast.promise(query, {
+      loading: "Updating product…" ,
+      success: "Product updated!",
+      error: "Something went wrong!",
+    });
+
+    const { error } = await query;
+    if (!error) {
+      setTimeout(() => {
+        setMounted(false);
+        setTimeout(() => {
+          router.push('/');
+        }, 300);
+      }, 500)
+    }
+  };
+
+  const getImageSrc = (img) => {
+    if (img instanceof File) {
+      return URL.createObjectURL(img);
+    }
+    console.log(img);
+
+    return img;
+  };
+
+  const makePrimary = (index) => {
+    setForm((prev) => {
+      const imgs = [...prev.images];
+      const selected = imgs.splice(index, 1)[0];
+      return {
+        ...prev,
+        images: [selected, ...imgs],
+      };
+    });
+  };
 
   useEffect(() => {
     setMounted(true);
@@ -35,7 +115,7 @@ const AddProduct = () => {
   });
 
   const CATEGORY_MAP = {
-    men: [
+    Men: [
       "T-Shirt",
       "Oversized T-Shirt",
       "Polo T-Shirt",
@@ -61,8 +141,7 @@ const AddProduct = () => {
       "Shorts",
       "Co-ord Set",
     ],
-
-    women: [
+    Women: [
       "Top",
       "Crop Top",
       "T-Shirt",
@@ -90,8 +169,7 @@ const AddProduct = () => {
       "Wide Leg Pants",
       "Cargo Pants",
     ],
-
-    kids: [
+    Kids: [
       "T-Shirt",
       "Printed T-Shirt",
       "Shirt",
@@ -107,7 +185,7 @@ const AddProduct = () => {
       "Co-ord Set",
       "Nightwear",
     ],
-    unisex: [
+    Unisex: [
       "T-Shirt",
       "Oversized T-Shirt",
       "Graphic T-Shirt",
@@ -146,13 +224,9 @@ const AddProduct = () => {
   const handleImageSelect = (e) => {
     const files = Array.from(e.target.files);
 
-    // limit to 5 images
-    const remainingSlots = 5 - form.images.length;
-    const selectedFiles = files.slice(0, remainingSlots);
-
     setForm((prev) => ({
       ...prev,
-      images: [...prev.images, ...selectedFiles],
+      images: [...prev.images, ...files],
     }));
 
   };
@@ -204,12 +278,18 @@ const AddProduct = () => {
         {/* Navbar Placeholder */}
         <div className='flex items-center justify-between mt-10 lg:mt-25 mb-10'>
           <div className='flex gap-4 items-center'>
-            <ArrowLeft className='h-5 md:h-7 lg:h-10 w-5 md:w-7 lg:w-10 cursor-pointer' onClick={() => router.push('/')} />
-            <h1 className='text-2xl md:text-3xl lg:text-5xl font-semibold'>Add new product</h1>
+            <ArrowLeft className='h-5 md:h-7 lg:h-10 w-5 md:w-7 lg:w-10 cursor-pointer'
+            onClick={() => {isEdit ? router.push('/products') : router.push('/')}} />
+            <h1 className='text-2xl md:text-3xl lg:text-5xl font-semibold'>{isEdit ? "Update" : "Add a new"} product</h1>
           </div>
 
           <button
             onClick={() => {
+              if (isEdit) {
+                handleSave();
+                return;
+              }
+
               if (canSave) {
                 toast.promise(
                   saveProduct().then(() => setTimeout(() => {
@@ -220,8 +300,8 @@ const AddProduct = () => {
                   }, 500)
                   ),
                   {
-                    loading: "Saving product...",
-                    success: "Product saved successfully!",
+                    loading: "Adding product...",
+                    success: "Product added successfully!",
                     error: (err) => err.message,
                   }
                 );
@@ -231,7 +311,7 @@ const AddProduct = () => {
               }
             }}
             className={`flex gap-2 px-6 py-3 rounded-xl transition ${canSave ? "border-white border-2 cursor-pointer hover:text-black hover:bg-white" : `${canShowButton ? "border-gray-500 border-2 text-gray-500 cursor-not-allowed hover:text-red-600 hover:border-red-600" : "hidden"}`}`}>
-            Save Product {canSave && <ArrowRight className='h-5 w-5 mt-0.5' />}
+            {isEdit ? "Update" : "Add"} Product {canSave && <ArrowRight className='h-5 w-5 mt-0.5' />}
           </button>
 
         </div>
@@ -306,10 +386,10 @@ const AddProduct = () => {
                 <option value="" disabled>
                   For whom?
                 </option>
-                <option value="men">Men's</option>
-                <option value="women">Women's</option>
-                <option value="kids">Kid's</option>
-                <option value="unisex">Unisex</option>
+                <option value="Men">Men's</option>
+                <option value="Women">Women's</option>
+                <option value="Kids">Kid's</option>
+                <option value="Unisex">Unisex</option>
               </select>
 
             </div>
@@ -379,17 +459,59 @@ const AddProduct = () => {
                 </div>
               </div>) : (
               <div className='flex w-full gap-4 overflow-y-scroll'>
-                {form.images.map((src, index) => (
-                  <div key={index} className="relative h-full aspect-2/3  shrink-0 rounded-3xl overflow-hidden">
+                {/* {form.images.map((src, index) => (
+                  <div key={index} className="relative h-full aspect-2/3  shrink-0 rounded-3xl overflow-hidden" onClick={() => makePrimary(index)} >
                     <Image
                       key={index}
-                      src={URL.createObjectURL(src)}
+                      src={getImageSrc(src)}
                       alt={`Product Image ${index + 1}`}
                       fill
                       className="object-cover object-center cursor-pointer"
+                      unoptimized
                     />
                   </div>
+                ))} */}
+                {form.images.map((src, index) => (
+                  <div
+                    key={index}
+                    onClick={() => makePrimary(index)}
+                    className={`group relative h-full aspect-2/3 shrink-0 rounded-3xl overflow-hidden cursor-pointer
+      ${index === 0 ? "ring-2 ring-amber-500" : ""}
+    `}
+                  >
+                    {/* Image */}
+                    <Image
+                      src={getImageSrc(src)}
+                      alt={`Product Image ${index + 1}`}
+                      fill
+                      unoptimized
+                      className="object-cover object-center"
+                    />
+
+                    {/* Primary badge */}
+                    {index === 0 && (
+                      <span className="absolute top-2 left-2 bg-amber-500 text-black text-xs px-2 py-0.5 rounded-full">
+                        Primary
+                      </span>
+                    )}
+
+                    {/* Hover Make Primary */}
+                    {index !== 0 && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation(); // 👈 important
+                          makePrimary(index);
+                        }}
+                        className="absolute inset-0 flex items-center justify-center
+          bg-black/50 text-white text-sm font-medium
+          opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        Make Primary
+                      </button>
+                    )}
+                  </div>
                 ))}
+
 
               </div>
             )
