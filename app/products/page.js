@@ -1,5 +1,5 @@
 "use client";
-import React, { use } from 'react'
+import React from 'react'
 import { useState, useEffect } from 'react';
 import { supabase } from "@/lib/createSupabaseClient";
 import Image from 'next/image';
@@ -8,6 +8,14 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 const EditProduct = () => {
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      if (!data.session) {
+        router.push("/auth");
+      }
+    });
+  }, []);
 
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(true);

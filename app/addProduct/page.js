@@ -1,5 +1,4 @@
 "use client";
-
 import React from 'react'
 import { ArrowLeft, ArrowRight, Package, Tag, User, GalleryHorizontalEnd } from 'lucide-react'
 import { useState, useEffect } from 'react'
@@ -11,6 +10,13 @@ import { getImgUrl } from "@/lib/getImgUrl";
 import { useSearchParams } from "next/navigation";
 
 const AddProduct = () => {
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      if (!data.session) {
+        router.push("/auth");
+      }
+    });
+  }, []);
 
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
@@ -60,7 +66,7 @@ const AddProduct = () => {
     const query = supabase.from("products").update(payload).eq("id", productId)
 
     toast.promise(query, {
-      loading: "Updating product…" ,
+      loading: "Updating product…",
       success: "Product updated!",
       error: "Something went wrong!",
     });
@@ -279,7 +285,7 @@ const AddProduct = () => {
         <div className='flex items-center justify-between mt-10 lg:mt-25 mb-10'>
           <div className='flex gap-4 items-center'>
             <ArrowLeft className='h-5 md:h-7 lg:h-10 w-5 md:w-7 lg:w-10 cursor-pointer'
-            onClick={() => {isEdit ? router.push('/products') : router.push('/')}} />
+              onClick={() => { isEdit ? router.push('/products') : router.push('/') }} />
             <h1 className='text-2xl md:text-3xl lg:text-5xl font-semibold'>{isEdit ? "Update" : "Add a new"} product</h1>
           </div>
 
