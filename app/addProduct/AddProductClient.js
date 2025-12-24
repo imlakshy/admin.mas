@@ -353,7 +353,7 @@ const AddProductClient = () => {
               />
             </div>
 
-            <div className="inline-flex items-baseline mt-2">
+            <div className="inline-flex items-baseline">
               {form.price !== "" && <span className="text-4xl">₹</span>}
 
               <input
@@ -377,7 +377,7 @@ const AddProductClient = () => {
               )}
             </div>
 
-            <div className='flex gap-2 items-center pt-4'>
+            <div className='flex gap-2 items-center'>
               <span className={`text-xl text-gray-500 ${form.stock === "" ? "hidden" : "block"}`}><Package /></span>
 
               <input type="number" placeholder='How many units?' value={form.stock} onChange={(e) => setForm({ ...form, stock: e.target.value })} className='' />
@@ -444,7 +444,7 @@ const AddProductClient = () => {
           </form>
 
           {/* Image Upload Section */}
-          <div className='lg:w-1/2 rounded-2xl h-135 w-260 max-w-full lg:mb-0 mb-24 flex gap-4 overflow-y-scroll' onClick={() => document.getElementById('imgInput').click()}>
+          <div className='lg:w-1/2 rounded-2xl h-135 w-260 max-w-full lg:mb-0 mb-14 flex gap-4 overflow-y-scroll' onClick={() => document.getElementById('imgInput').click()}>
             <input type="file" accept="image/*" multiple id='imgInput' className='hidden' onChange={handleImageSelect} />
 
             {form.images.length === 0 ? (

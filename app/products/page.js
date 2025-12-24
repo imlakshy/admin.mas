@@ -84,10 +84,24 @@ const EditProduct = () => {
 
     <div className='mx-4 lg:mx-12'>
       {/* Navbar */}
-      <div className='flex items-center gap-2 mt-10 lg:mt-25'>
-        <ArrowLeft className='h-5 md:h-7 lg:h-10 w-5 md:w-7 lg:w-10 cursor-pointer' onClick={() => router.push('/')} />
+      <div className='flex flex-col gap-2 mt-10 lg:mt-25'>
+        <div className='flex gap-2 items-center'>
+          <ArrowLeft className='h-7 lg:h-10 w-7 lg:w-10 cursor-pointer' onClick={() => router.push('/')} />
 
-        <h1 className='text-2xl md:text-3xl lg:text-5xl font-semibold'>Manage Products</h1>
+          <h1 className='text-2xl md:text-3xl lg:text-5xl font-semibold'>Manage Products</h1>
+        </div>
+
+        {/* Filters */}
+        {products.length > 0 && (<div className='flex items-center gap-2 my-4 font-light flex-wrap'>
+          <div className='shrink-0 p-2 bg-white/10 flex items-center'>Stocks &lt; <input type="number" placeholder='5' className='border-b w-9 text-center' /></div>
+
+          <div className='shrink-0 p-2 bg-white/10 flex items-center'>Discount &gt; <input type="number" placeholder='50' className='border-b w-9 text-center' />%</div>
+
+          <div className='shrink-0 p-2 bg-white/10 flex items-center'>Gender</div>
+
+          <input type="text" placeholder='Search...' className='flex-1 border border-gray-500 p-2 max-w-full w-auto rounded-full' />
+        </div>)}
+
       </div>
 
       {/* Table */}
@@ -98,17 +112,6 @@ const EditProduct = () => {
       )
         :
         (<div className="relative overflow-x-auto">
-          {/* Filters */}
-          <div className='flex items-center gap-2 my-4 font-light flex-wrap'>
-            <div className='shrink-0 p-2 bg-white/10 flex items-center'>Stocks &lt; <input type="number" placeholder='5' className='border-b w-9 text-center' /></div>
-
-            <div className='shrink-0 p-2 bg-white/10 flex items-center'>Discount &gt; <input type="number" placeholder='50' className='border-b w-9 text-center' />%</div>
-
-            <div className='shrink-0 p-2 bg-white/10 flex items-center'>Gender</div>
-
-            <input type="text" placeholder='Search...' className='flex-1 border border-gray-500 p-2 max-w-full w-auto rounded-full' />
-          </div>
-
           <table className="w-full min-w-210 border-collapse">
             <thead>
               <tr className="bg-white/10">
