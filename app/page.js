@@ -14,26 +14,22 @@ export default function Home() {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [name, setName] = useState("User");
-  const [loading, setLoading] = useState(false);
 
 
   const checkSession = async () => {
-    setLoading(true);
-
     await supabase.auth.getSession().then(({ data }) => {
       if (!data.session) {
         router.push("/auth");
-      } else { setName(data.session.user.user_metadata.display_name); }
+      } else {
+        setName(data.session.user.user_metadata.display_name);
+        setMounted(true);
+      }
     });
-
-    setLoading(false);
   }
 
-   useEffect(() => {
+  useEffect(() => {
     checkSession();
-    setMounted(true);
   }, []);
-
 
 
   const overviewData = [{
@@ -81,13 +77,14 @@ export default function Home() {
 
   }]
 
-  return (!loading && (
+  return (
     <div className={`transition-all duration-1000 ease-out
     ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
+
+      {/* Navbar */}
       <div className="flex flex-col md:flex-row justify-between mx-10 md:mx-20 lg:mx-30 mt-10 md:mt-32">
         <div className="flex flex-col justify-center">
           <span className="text-2xl md:text-[48px] font-light">Hey 👋</span>
-
           <span className="text-[48px] md:text-[96px] font-extrabold">{name}!</span>
         </div>
 
@@ -100,7 +97,7 @@ export default function Home() {
         </div>
       </div>
 
-
+      {/* Stats Overview */}
       <div className="flex flex-wrap w-screen p-4 md:p-8">
         {overviewData.map((item, index) => (
           <div key={index} className="card">
@@ -115,6 +112,7 @@ export default function Home() {
       </div>
 
 
+      {/* Quick Actions */}
       <span className="px-6 md:px-10 text-3xl font-semibold">Quick Actions: </span>
       <div className="flex flex-wrap w-screen px-4 md:px-8">
         {quickActions.map((action, index) => (
@@ -128,5 +126,5 @@ export default function Home() {
         ))}
       </div>
     </div>
-  ));
+  );
 }

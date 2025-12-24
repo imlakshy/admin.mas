@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 "use client";
 import React from 'react'
 import { ArrowLeft, ArrowRight, Package, Tag, User, GalleryHorizontalEnd } from 'lucide-react'
@@ -10,6 +12,7 @@ import { getImgUrl } from "@/lib/getImgUrl";
 import { useSearchParams } from "next/navigation";
 
 const AddProduct = () => {
+  
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
       if (!data.session) {
