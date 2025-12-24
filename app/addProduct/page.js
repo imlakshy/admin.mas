@@ -1,4 +1,4 @@
-export const dynamic = "force-dynamic";
+
 
 "use client";
 import React from 'react'
@@ -10,6 +10,8 @@ import { toast } from "sonner";
 import { supabase } from "@/lib/createSupabaseClient";
 import { getImgUrl } from "@/lib/getImgUrl";
 import { useSearchParams } from "next/navigation";
+
+export const dynamic = "force-dynamic";
 
 const AddProduct = () => {
   
