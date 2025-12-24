@@ -444,7 +444,7 @@ const AddProductClient = () => {
           </form>
 
           {/* Image Upload Section */}
-          <div className='lg:w-1/2 rounded-2xl h-135 w-260 max-w-full lg:mb-0 mb-14 flex gap-4 overflow-y-scroll' onClick={() => document.getElementById('imgInput').click()}>
+          <div className='lg:w-1/2 rounded-2xl h-135 w-260 max-w-full lg:mb-0 mb-6 flex gap-4 overflow-y-scroll' onClick={() => document.getElementById('imgInput').click()}>
             <input type="file" accept="image/*" multiple id='imgInput' className='hidden' onChange={handleImageSelect} />
 
             {form.images.length === 0 ? (
