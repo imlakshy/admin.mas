@@ -1,6 +1,6 @@
 "use client";
-import React from 'react'
-import { ArrowLeft, ArrowRight, Package, Tag, User, GalleryHorizontalEnd } from 'lucide-react'
+import React, { use } from 'react'
+import { ArrowLeft, ArrowRight, Package, Tag, User, GalleryHorizontalEnd, Star, X, Plus } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import Image from "next/image";
 import { useRouter } from 'next/navigation';
@@ -12,19 +12,26 @@ import { useSearchParams } from "next/navigation";
 export const dynamic = "force-dynamic";
 
 const AddProductClient = () => {
-  
+
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (!data.session) {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
         router.push("/auth");
+        return;
       }
-    });
+    };
+    checkAuth();
+    return () => { };
   }, []);
+
 
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const searchParams = useSearchParams();
   const productId = searchParams.get("id");
+  const [colorInput, setColorInput] = useState("");
+
 
   useEffect(() => {
     if (productId) fetchProduct();
@@ -39,15 +46,17 @@ const AddProductClient = () => {
 
     if (!error) {
       setForm({
-        brand: data.brand,
-        name: data.name,
-        description: data.description,
-        cost: data.cost,
-        price: data.price,
-        stock: data.stock,
-        gender: data.gender,
-        category: data.category,
-        images: data.images || [],
+        brand: data.brand ?? "",
+        name: data.name ?? "",
+        description: data.description ?? "",
+        cost: data.cost ?? "",
+        price: data.price ?? "",
+        stock: data.stock ?? "",
+        gender: data.gender ?? "",
+        category: data.category ?? "",
+        sizes: data.sizes ?? ["S", "M", "L", "XL", "XXL"],
+        color: data.color === null ? [] : (Array.isArray(data.color) ? data.color : (data.color ? [data.color] : [])),
+        images: data.images ?? [],
       });
     }
   };
@@ -63,6 +72,8 @@ const AddProductClient = () => {
       stock: form.stock,
       gender: form.gender,
       category: form.category,
+      sizes: form.sizes,
+      colors: form.color,
       images: form.images,
     };
 
@@ -89,8 +100,6 @@ const AddProductClient = () => {
     if (img instanceof File) {
       return URL.createObjectURL(img);
     }
-    console.log(img);
-
     return img;
   };
 
@@ -101,6 +110,16 @@ const AddProductClient = () => {
       return {
         ...prev,
         images: [selected, ...imgs],
+      };
+    });
+  };
+
+  const removeImage = (index) => {
+    setForm((prev) => {
+      const newImages = prev.images.filter((_, i) => i !== index);
+      return {
+        ...prev,
+        images: newImages,
       };
     });
   };
@@ -120,6 +139,8 @@ const AddProductClient = () => {
     stock: "",
     gender: "",
     category: "",
+    sizes: ["S", "M", "L", "XL", "XXL"],
+    color: [],
     images: [],
   });
 
@@ -211,9 +232,15 @@ const AddProductClient = () => {
     ],
   };
 
-  const canSave = Object.values(form).every(v =>
-    Array.isArray(v) ? v.length > 0 : String(v).trim() !== ""
-  );
+  const canSave = Object.entries(form).every(([key, v]) => {
+    if (key === 'sizes') {
+      return Array.isArray(v) && v.length > 0;
+    }
+    if (key === 'color') {
+      return Array.isArray(v);
+    }
+    return Array.isArray(v) ? v.length > 0 : String(v).trim() !== "";
+  });
 
   const canShowButton = Object.values({
     brand: form.brand.trim(),
@@ -237,7 +264,6 @@ const AddProductClient = () => {
       ...prev,
       images: [...prev.images, ...files],
     }));
-
   };
 
   const saveProduct = async () => {
@@ -259,31 +285,33 @@ const AddProductClient = () => {
             stock: form.stock,
             gender: form.gender,
             category: form.category,
+            sizes: form.sizes,
+            colors: form.color,
             images: urls,
           },
         ]);
 
       if (error) throw error;
     } catch (err) {
-      console.error("Save failed:", err);
+      toast.error("Save failed:");
     }
   };
 
   const [showOptions, setShowOptions] = useState(false);
-  const filteredCategories =
-    form.gender && form.category
-      ? CATEGORY_MAP[form.gender].filter((item) =>
-        item.toLowerCase().includes(form.category.toLowerCase())
-      )
-      : form.gender
-        ? CATEGORY_MAP[form.gender]
-        : [];
+  const filteredCategories = form.gender && form.category
+    ? CATEGORY_MAP[form.gender].filter((item) =>
+      item.toLowerCase().includes(form.category.toLowerCase())
+    )
+    : form.gender
+      ? CATEGORY_MAP[form.gender]
+      : [];
 
 
   return (
     <div className={`transition-all duration-1000 ease-out
     ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
       <div className='mx-6 lg:mx-12'>
+
         {/* Navbar Placeholder */}
         <div className='flex items-center justify-between mt-10 lg:mt-25 mb-10'>
           <div className='flex gap-4 items-center'>
@@ -304,7 +332,7 @@ const AddProductClient = () => {
                   saveProduct().then(() => setTimeout(() => {
                     setMounted(false);
                     setTimeout(() => {
-                      router.push('/');
+                      router.push('/products');
                     }, 300);
                   }, 500)
                   ),
@@ -329,7 +357,7 @@ const AddProductClient = () => {
         <div className='flex gap-4 lg:gap-8 flex-col lg:flex-row'>
 
           {/* Product detail form */}
-          <form className='flex flex-col gap-2 lg:w-1/2'>
+          <form className='flex flex-col gap-2 lg:w-1/2 pb-10'>
             <input type="text" placeholder="Which Brand?" value={form.brand} onChange={(e) => setForm({ ...form, brand: e.target.value })} className={`text-xl`} />
 
             <input type="text" placeholder='Product Name' value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className='text-3xl font-semibold' />
@@ -403,52 +431,138 @@ const AddProductClient = () => {
 
             </div>
 
-            {form.gender && (<div className='flex gap-2 items-center'>
-              <span className={`text-xl text-gray-500 ${form.category === "" ? "hidden" : "block"}`}><Tag /></span>
+            {form.gender && (
+              <div className='flex gap-2 items-center mb-4'>
+                <span className={`text-xl text-gray-500 ${form.category === "" ? "hidden" : "block"}`}>
+                  <Tag />
+                </span>
 
-              <div className="relative">
+                <div className="relative flex-1">
+                  <input
+                    type="text"
+                    placeholder="Type?"
+                    value={form.category}
+                    onChange={(e) => {
+                      setForm({ ...form, category: e.target.value });
+                      setShowOptions(true);
+                    }}
+                    onFocus={() => setShowOptions(true)}
+                    onBlur={() => {
+                      setTimeout(() => setShowOptions(false), 200);
+                    }}
+                    className="w-full text-xl"
+                  />
+
+                  {showOptions && filteredCategories.length > 0 && (
+                    <>
+                      <div
+                        className="fixed inset-0 z-10"
+                        onClick={() => setShowOptions(false)}
+                      />
+                      <ul className="absolute z-20 w-full rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 mt-2 max-h-48 overflow-y-auto shadow-lg">
+                        {filteredCategories.map((item) => (
+                          <li
+                            key={item}
+                            onClick={() => {
+                              setForm({
+                                ...form,
+                                category: item,
+                              });
+                              setShowOptions(false);
+                            }}
+                            className="px-4 py-2.5 cursor-pointer hover:bg-white/20 transition-colors border-b border-white/5 last:border-b-0"
+                          >
+                            {item}
+                          </li>
+                        ))}
+                      </ul>
+                    </>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {form.category && (
+              <div className='flex gap-2 items-center flex-wrap'>
+                <span className={`text-xl text-gray-500 ${form.sizes.length === 0 ? "hidden" : "block"}`}>Sizes:</span>
+                <div className="flex gap-4 items-center">
+                  {["S", "M", "L", "XL", "XXL"].map((size) => (
+                    <label key={size} className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={form.sizes.includes(size)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setForm({
+                              ...form,
+                              sizes: [...form.sizes, size],
+                            });
+                          } else {
+                            setForm({
+                              ...form,
+                              sizes: form.sizes.filter((s) => s !== size),
+                            });
+                          }
+                        }}
+                        className="w-4 h-4 cursor-pointer"
+                      />
+                      <span className="text-lg">{size}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {form.category && (
+              <div className="flex gap-2 items-center flex-wrap">
                 <input
                   type="text"
-                  placeholder="Type?"
-                  value={form.category}
-                  onChange={(e) => {
-                    setForm({ ...form, category: e.target.value });
-                    setShowOptions(true);
-                  }}
-                  onFocus={() => setShowOptions(true)}
+                  placeholder="Color?"
+                  value={colorInput}
+                  onChange={(e) => setColorInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
 
+                      const value = colorInput.trim();
+                      if (!value) return;
+                      if (form.color.some(c => c.toLowerCase() === value.toLowerCase())) return;
+
+                      setForm({
+                        ...form,
+                        color: [...form.color, value],
+                      });
+
+                      setColorInput("");
+                    }
+                  }}
+                  className="text-xl bg-transparent outline-none"
                 />
 
-                {showOptions && filteredCategories.length > 0 && (
-                  <ul className="absolute z-10 w-full rounded bg-white/10 mt-1 max-h-40 overflow-y-auto">
-                    {filteredCategories.map((item) => (
-                      <li
-                        key={item}
-                        onClick={() => {
-                          setForm({
-                            ...form,
-                            category: item,
-                          });
-                          setShowOptions(false);
-                        }}
-                        className="px-3 py-2 cursor-pointer hover:bg-gray-700"
+                {form.color.length > 0 && (
+                  <div className="flex gap-2 flex-wrap items-center">
+                    <span className="text-gray-500">Colors:</span>
+                    {form.color.map((color, index) => (
+                      <span
+                        key={index}
+                        className="px-2 py-1 bg-gray-700 rounded text-sm"
                       >
-                        {item}
-                      </li>
+                        {color}
+                      </span>
                     ))}
-                  </ul>
+                  </div>
                 )}
               </div>
+            )}
 
-            </div>)}
           </form>
 
           {/* Image Upload Section */}
-          <div className='lg:w-1/2 rounded-2xl h-135 w-260 max-w-full lg:mb-0 mb-6 flex gap-4 overflow-y-scroll' onClick={() => document.getElementById('imgInput').click()}>
+          <div className='lg:w-1/2 rounded-2xl h-135 w-260 max-w-full lg:mb-0 mb-6 flex gap-4 overflow-y-scroll'>
             <input type="file" accept="image/*" multiple id='imgInput' className='hidden' onChange={handleImageSelect} />
 
             {form.images.length === 0 ? (
-              <div className='relative flex justify-center items-center'>
+              <div className='relative flex justify-center items-center cursor-pointer' onClick={() => document.getElementById('imgInput').click()}>
                 <div className='opacity-4 flex gap-4 overflow-hidden rounded-2xl'>
                   {StockImages.map((src, index) => (
                     <Image
@@ -468,60 +582,73 @@ const AddProductClient = () => {
                 </div>
               </div>) : (
               <div className='flex w-full gap-4 overflow-y-scroll'>
-                {/* {form.images.map((src, index) => (
-                  <div key={index} className="relative h-full aspect-2/3  shrink-0 rounded-3xl overflow-hidden" onClick={() => makePrimary(index)} >
-                    <Image
-                      key={index}
-                      src={getImageSrc(src)}
-                      alt={`Product Image ${index + 1}`}
-                      fill
-                      className="object-cover object-center cursor-pointer"
-                      unoptimized
-                    />
-                  </div>
-                ))} */}
                 {form.images.map((src, index) => (
                   <div
                     key={index}
-                    onClick={() => makePrimary(index)}
-                    className={`group relative h-full aspect-2/3 shrink-0 rounded-3xl overflow-hidden cursor-pointer
-      ${index === 0 ? "ring-2 ring-amber-500" : ""}
-    `}
+                    className="relative h-full aspect-2/3 shrink-0 rounded-3xl overflow-hidden group cursor-pointer"
+                    onClick={() => {
+                      if (index !== 0) {
+                        makePrimary(index);
+                      }
+                    }}
                   >
                     {/* Image */}
                     <Image
                       src={getImageSrc(src)}
                       alt={`Product Image ${index + 1}`}
                       fill
-                      unoptimized
                       className="object-cover object-center"
+                      unoptimized
                     />
 
-                    {/* Primary badge */}
+                    {/* Primary Badge */}
                     {index === 0 && (
-                      <span className="absolute top-2 left-2 bg-amber-500 text-black text-xs px-2 py-0.5 rounded-full">
-                        Primary
-                      </span>
+                      <div className="absolute top-2 left-2 bg-amber-500 text-black text-xs px-2 py-1 rounded-full flex items-center gap-1 z-20">
+                        <Star className="h-3 w-3 fill-black" />
+                        <span>Primary</span>
+                      </div>
                     )}
 
-                    {/* Hover Make Primary */}
-                    {index !== 0 && (
+                    <div className="absolute top-2 right-2 flex gap-1 z-20 opacity-0 group-hover:opacity-100 transition-opacity">
+                      {/* Make Primary Button */}
+                      {index !== 0 && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            makePrimary(index);
+                          }}
+                          className="bg-white/90 hover:bg-white text-black p-1.5 rounded-full shadow-lg transition-all hover:scale-110"
+                          title="Make Primary"
+                        >
+                          <Star className="h-4 w-4" />
+                        </button>
+                      )}
+
+                      {/* Remove Button */}
                       <button
                         onClick={(e) => {
-                          e.stopPropagation(); // 👈 important
-                          makePrimary(index);
+                          e.stopPropagation();
+                          removeImage(index);
                         }}
-                        className="absolute inset-0 flex items-center justify-center
-          bg-black/50 text-white text-sm font-medium
-          opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="bg-red-500/90 hover:bg-red-600 text-white p-1.5 rounded-full shadow-lg transition-all hover:scale-110"
+                        title="Remove Image"
                       >
-                        Make Primary
+                        <X className="h-4 w-4" />
                       </button>
-                    )}
+                    </div>
                   </div>
                 ))}
 
-
+                {/* Add More Card */}
+                <div
+                  className="relative h-full aspect-2/3 shrink-0 rounded-3xl overflow-hidden border-2 border-dashed border-white/30 hover:border-white/50 transition-all cursor-pointer flex items-center justify-center bg-white/5 hover:bg-white/10"
+                  onClick={() => document.getElementById('imgInput').click()}
+                >
+                  <div className="flex flex-col items-center gap-2 text-white/70 hover:text-white transition-colors">
+                    <Plus className="h-8 w-8" />
+                    <span className="text-sm">Add More</span>
+                  </div>
+                </div>
               </div>
             )
             }

@@ -15,21 +15,43 @@ export default function Home() {
   const [mounted, setMounted] = useState(false);
   const [name, setName] = useState("User");
 
+  useEffect(() => {
+    let mounted = true;
 
   const checkSession = async () => {
-    await supabase.auth.getSession().then(({ data }) => {
-      if (!data.session) {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!mounted) return;
+
+      if (!session) {
         router.push("/auth");
-      } else {
-        setName(data.session.user.user_metadata.display_name);
+        return;
+      }
+
+      setName(session.user.user_metadata?.display_name || "User");
+      setMounted(true);
+    };
+
+    // Check session immediately
+    checkSession();
+
+    // Also listen for auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (!mounted) return;
+
+      if (event === 'SIGNED_IN' && session) {
+        setName(session.user.user_metadata?.display_name || "User");
         setMounted(true);
+      } else if (event === 'SIGNED_OUT' || !session) {
+        router.push("/auth");
       }
     });
-  }
 
-  useEffect(() => {
-    checkSession();
-  }, []);
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, [router]);
 
 
   const overviewData = [{

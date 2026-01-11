@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/lib/createSupabaseClient";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -12,6 +12,28 @@ export default function AuthPage() {
   const [name, setName] = useState("");
   const [isNewUser, setIsNewUser] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  // Check if user is already logged in
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        router.push("/");
+      }
+    };
+    checkSession();
+
+    // Listen for auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && session) {
+        router.push("/");
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [router]);
 
   const handleSignup = async () => {
     setLoading(true);
@@ -44,23 +66,33 @@ export default function AuthPage() {
     setLoading(true);
 
     try {
-      toast.promise(
-        supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
           email: email ? `${email}@mas.com` : email,
           password,
-        }).then(
-          ({ error }) => {
-          if (error) throw error;
-        }
-      ),
-        {
-          loading: "Logging in...",
-          success: "Logged in successfully!",
-          error: (err) => err.message,
-        }
-      );
-      router.push("/");
-    } finally {
+      });
+
+      if (error) {
+        toast.error(error.message);
+        setLoading(false);
+        return;
+      }
+
+      toast.success("Logged in successfully!");
+      
+      // The onAuthStateChange listener will handle the redirect
+      // But also verify session is set
+      const { data: sessionData } = await supabase.auth.getSession();
+      if (sessionData?.session) {
+        // Small delay to ensure state is updated
+        setTimeout(() => {
+          router.push("/");
+          router.refresh();
+        }, 300);
+      } else {
+        setLoading(false);
+      }
+    } catch (err) {
+      toast.error(err.message || "Login failed");
       setLoading(false);
     }
   };
@@ -78,27 +110,29 @@ export default function AuthPage() {
         {isNewUser ?
           (<div>
             <div className="flex flex-col gap-8">
-              <h1 className="font-extralight text-3xl text-white">Sign up</h1>
+              <h1 className="text-3xl text-white">Sign up</h1>
 
               <input type="text" id="name" placeholder="Name" className="border-b border-white font-light p-2" value={name} onChange={(e) => setName(e.target.value)} />
 
               <input type="text" id="username" placeholder="Username" className="border-b border-white font-light p-2" value={email} onChange={(e) => setEmail(e.target.value)} />
 
               <input type="password" id="password" placeholder="Password" className="border-b border-white font-light p-2" value={password} onChange={(e) => setPassword(e.target.value)} />
-              <button className="cursor-pointer hover:bg-gray-200 border p-2 bg-white text-black font-light" onClick={handleSignup}>Sign Up</button>
+              <button className="cursor-pointer hover:bg-gray-200 border p-2 bg-white text-black font-light" onClick={handleSignup}>Sign up</button>
             </div>
             <button className="cursor-pointer hover:text-gray-400 border p-2 mt-2 text-white font-light w-full" onClick={() => setIsNewUser(false)}>Login</button>
           </div>)
           :
           (<div>
             <div className="flex flex-col gap-8">
-              <h1 className="font-extralight text-3xl text-white">Log in</h1>
+              <h1 className="text-3xl text-white">Log in</h1>
 
               <input type="text" id="username" placeholder="Username" className="border-b border-white font-light p-2" value={email} onChange={(e) => setEmail(e.target.value)} />
 
               <input type="password" id="password" placeholder="Password" className="border-b border-white font-light p-2" value={password} onChange={(e) => setPassword(e.target.value)} />
 
-              <button className={`cursor-pointer hover:bg-gray-300 border p-2 bg-white text-black font-light`} onClick={handleLogin}>Log In</button>
+              {/* <button className="text-start text-gray-500 font-light hover:underline cursor-pointer">Forgot your password?</button> */}
+
+              <button className={`cursor-pointer hover:bg-gray-300 border p-2 bg-white text-black font-light`} onClick={handleLogin}>Log in</button>
             </div>
             <button className="cursor-pointer hover:text-gray-400 border p-2 mt-2 text-white font-light w-full" onClick={() => setIsNewUser(true)}>Register</button>
           </div>)
