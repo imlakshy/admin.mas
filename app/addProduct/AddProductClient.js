@@ -90,7 +90,7 @@ const AddProductClient = () => {
       setTimeout(() => {
         setMounted(false);
         setTimeout(() => {
-          router.push('/');
+          router.push('/products');
         }, 300);
       }, 500)
     }
